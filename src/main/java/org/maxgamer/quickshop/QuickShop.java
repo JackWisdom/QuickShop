@@ -46,7 +46,6 @@ import org.maxgamer.quickshop.Economy.Economy_Vault;
 import org.maxgamer.quickshop.Listeners.BlockListener;
 import org.maxgamer.quickshop.Listeners.ChatListener;
 import org.maxgamer.quickshop.Listeners.ChunkListener;
-import org.maxgamer.quickshop.Listeners.HeroChatListener;
 import org.maxgamer.quickshop.Listeners.DisplayProtectionListener;
 import org.maxgamer.quickshop.Listeners.LockListener;
 import org.maxgamer.quickshop.Listeners.PlayerListener;
@@ -82,7 +81,7 @@ public class QuickShop extends JavaPlugin {
 	private Database database;
 	// Listeners - We decide which one to use at runtime
 	private ChatListener chatListener;
-	private HeroChatListener heroChatListener;
+
 	// Listeners (These don't)
 	private BlockListener blockListener;
 	private PlayerListener playerListener;
@@ -90,7 +89,7 @@ public class QuickShop extends JavaPlugin {
 	private ChunkListener chunkListener;
 	private WorldListener worldListener;
 	private BukkitTask itemWatcherTask;
-	private LogWatcher logWatcher;
+
 	/** Whether players are required to sneak to create/buy from a shop */
 	public boolean sneak;
 	/** Whether players are required to sneak to create a shop */
@@ -98,7 +97,7 @@ public class QuickShop extends JavaPlugin {
 	/** Whether players are required to sneak to trade with a shop */
 	public boolean sneakTrade;
 	/** Whether we should use display items or not */
-	public boolean display = true;
+	public boolean display = false;
 	/**
 	 * Whether we players are charged a fee to change the price on their shop
 	 * (To help deter endless undercutting
@@ -163,11 +162,7 @@ public class QuickShop extends JavaPlugin {
 			ItemWatcher itemWatcher = new ItemWatcher(this);
 			itemWatcherTask = Bukkit.getScheduler().runTaskTimer(this, itemWatcher, 600, 600);
 		}
-		if (this.getConfig().getBoolean("log-actions")) {
-			// Logger Handler
-			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
-			logWatcher.task = Bukkit.getScheduler().runTaskTimerAsynchronously(this, this.logWatcher, 150, 150);
-		}
+
 		if (getConfig().getBoolean("shop.lock")) {
 			LockListener ll = new LockListener(this);
 			getServer().getPluginManager().registerEvents(ll, this);
@@ -405,11 +400,7 @@ public class QuickShop extends JavaPlugin {
 			Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
 		}
 		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
-		if (this.getConfig().getBoolean("force-bukkit-chat-handler", false) && Bukkit.getPluginManager().getPlugin("Herochat") != null) {
-			this.getLogger().info("Found Herochat... Hooking!");
-			this.heroChatListener = new HeroChatListener(this);
-			Bukkit.getServer().getPluginManager().registerEvents(heroChatListener, this);
-		} else {
+ {
 			this.chatListener = new ChatListener(this);
 			Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
 		}
@@ -463,7 +454,7 @@ public class QuickShop extends JavaPlugin {
 		this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
 		MsgUtil.loadCfgMessages();
 	}
-
+  public static void log(String msg){}
 	/**
 	 * Tries to load the economy and its core. If this fails, it will try to use
 	 * vault. If that fails, it will return false.
@@ -491,10 +482,7 @@ public class QuickShop extends JavaPlugin {
 		if (itemWatcherTask != null) {
 			itemWatcherTask.cancel();
 		}
-		if (logWatcher != null) {
-			logWatcher.task.cancel();
-			logWatcher.close(); // Closes the file
-		}
+
 		/* Remove all display items, and any dupes we can find */
 		shopManager.clear();
 		/* Empty the buffer */
@@ -523,13 +511,6 @@ public class QuickShop extends JavaPlugin {
 	 * @param s
 	 *            The string to log. It will be prefixed with the date and time.
 	 */
-	public void log(String s) {
-		if (this.logWatcher == null)
-			return;
-		Date date = Calendar.getInstance().getTime();
-		Timestamp time = new Timestamp(date.getTime());
-		this.logWatcher.add("[" + time.toString() + "] " + s);
-	}
 
 	/**
 	 * @return Returns the database handler for queries etc.

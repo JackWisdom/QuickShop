@@ -1,10 +1,10 @@
-name: ${name}
-main: ${package}.${name}
-version: ${version}
-authors: [Netherfoam, Timtower, KaiNoMood]
-
+name: QuickShop
+main: org.maxgamer.quickshop.QuickShop
+version: 1.0
+authors: [JackWisdom]
+api-version: 1.13
 description: Economy Shops plugin
-softdepend: [Herochat, Vault, Essentials, OpenInv]
+softdepend: [Vault]
 
 commands:
     qs:

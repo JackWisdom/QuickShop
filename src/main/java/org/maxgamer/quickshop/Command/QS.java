@@ -229,53 +229,7 @@ public class QS implements CommandExecutor {
 		}
 	}
 
-	private void find(CommandSender sender, String[] args) {
-		if (sender instanceof Player && sender.hasPermission("quickshop.find")) {
-			if (args.length < 2) {
-				sender.sendMessage(MsgUtil.getMessage("command.no-type-given"));
-				return;
-			}
-			StringBuilder sb = new StringBuilder(args[1]);
-			for (int i = 2; i < args.length; i++) {
-				sb.append(" " + args[i]);
-			}
-			String lookFor = sb.toString();
-			lookFor = lookFor.toLowerCase();
-			Player p = (Player) sender;
-			Location loc = p.getEyeLocation().clone();
-			double minDistance = plugin.getConfig().getInt("shop.find-distance");
-			double minDistanceSquared = minDistance * minDistance;
-			int chunkRadius = (int) minDistance / 16 + 1;
-			Shop closest = null;
-			Chunk c = loc.getChunk();
-			for (int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++) {
-				for (int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++) {
-					Chunk d = c.getWorld().getChunkAt(x, z);
-					HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
-					if (inChunk == null)
-						continue;
-					for (Shop shop : inChunk.values()) {
-						if (shop.getDataName().toLowerCase().contains(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared) {
-							closest = shop;
-							minDistanceSquared = shop.getLocation().distanceSquared(loc);
-						}
-					}
-				}
-			}
-			if (closest == null) {
-				sender.sendMessage(MsgUtil.getMessage("no-nearby-shop", args[1]));
-				return;
-			}
-			Location lookat = closest.getLocation().clone().add(0.5, 0.5, 0.5);
-			// Hack fix to make /qs find not used by /back
-			p.teleport(this.lookAt(loc, lookat).add(0, -1.62, 0), TeleportCause.UNKNOWN);
-			p.sendMessage(MsgUtil.getMessage("nearby-shop-this-way", "" + (int) Math.floor(Math.sqrt(minDistanceSquared))));
-			return;
-		} else {
-			sender.sendMessage(MsgUtil.getMessage("no-permission"));
-			return;
-		}
-	}
+
 
 	@SuppressWarnings("deprecation")
 	private void create(CommandSender sender, String[] args) {
@@ -307,7 +261,7 @@ public class QS implements CommandExecutor {
 								p.sendMessage(MsgUtil.getMessage("no-double-chests"));
 								return;
 							}
-							if (Util.isBlacklisted(item.getType()) && !p.hasPermission("quickshop.bypass." + item.getTypeId())) {
+							if (Util.isBlacklisted(item.getType()) && !p.hasPermission("quickshop.bypass." + item.getType())) {
 								p.sendMessage(MsgUtil.getMessage("blacklisted-item"));
 								return;
 							}
@@ -522,9 +476,6 @@ public class QS implements CommandExecutor {
 				return true;
 			} else if (subArg.equals("setowner")) {
 				setOwner(sender, args);
-				return true;
-			} else if (subArg.equals("find")) {
-				find(sender, args);
 				return true;
 			} else if (subArg.startsWith("create")) {
 				create(sender, args);

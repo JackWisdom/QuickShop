@@ -145,9 +145,7 @@ public class MsgUtil {
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.effects", effects));
 			}
 		}
-		if (Util.isTool(items.getType())) {
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.damage-percent-remaining", Util.getToolPercentage(items)));
-		}
+
 		if (shop.isSelling()) {
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.stock", "" + shop.getRemainingStock()));
 		} else {
@@ -159,30 +157,7 @@ public class MsgUtil {
 		} else {
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.this-shop-is-selling"));
 		}
-		Map<Enchantment, Integer> enchs = items.getItemMeta().getEnchants();
-		if (enchs != null && !enchs.isEmpty()) {
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------" + MsgUtil.getMessage("menu.enchants") + "-----------------------+");
-			for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey().getName() + " " + entries.getValue());
-			}
-		}
-		try {
-			Class.forName("org.bukkit.inventory.meta.EnchantmentStorageMeta");
-			if (items.getItemMeta() instanceof EnchantmentStorageMeta) {
-				EnchantmentStorageMeta stor = (EnchantmentStorageMeta) items.getItemMeta();
-				stor.getStoredEnchants();
-				enchs = stor.getStoredEnchants();
-				if (enchs != null && !enchs.isEmpty()) {
-					p.sendMessage(ChatColor.DARK_PURPLE + "+-----------------" + MsgUtil.getMessage("menu.stored-enchants") + "--------------------+");
-					for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-						p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey().getName() + " " + entries.getValue());
-					}
-				}
-			}
-		} catch (ClassNotFoundException e) {
-			// They don't have an up to date enough build of CB to do this.
-			// TODO: Remove this when it becomes redundant
-		}
+
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 

@@ -92,12 +92,7 @@ public class ContainerShop implements Shop {
 		return Util.countItems(this.getInventory(), this.getItem());
 	}
 
-	/**
-	 * Returns the number of free spots in the chest for the particular item.
-	 * 
-	 * @param stackSize
-	 * @return
-	 */
+
 	public int getRemainingSpace() {
 		if (this.unlimited)
 			return 10000;
@@ -344,17 +339,7 @@ public class ContainerShop implements Shop {
 		}
 	}
 
-	/**
-	 * Buys amount of item from Player p. Does NOT check our inventory, or
-	 * balances
-	 * 
-	 * @param p
-	 *            The player to buy from
-	 * @param item
-	 *            The itemStack to buy
-	 * @param amount
-	 *            The amount to buy
-	 */
+
 	public void buy(Player p, int amount) {
 		if (amount < 0)
 			this.sell(p, -amount);
@@ -588,46 +573,11 @@ public class ContainerShop implements Shop {
 	}
 
 	public boolean isValid() {
-		checkDisplay();
+
 		return Util.canBeShop(this.getLocation().getBlock());
 	}
 
-	private void checkDisplay() {
-		if (plugin.display == false)
-			return;
-		if (getLocation().getWorld() == null)
-			return; // not loaded
-		boolean trans = Util.isTransparent(getLocation().clone().add(0.5, 1.2, 0.5).getBlock().getType());
-		if (trans && this.getDisplayItem() == null) {
-			this.displayItem = new DisplayItem(this, this.getItem());
-			this.getDisplayItem().spawn();
-		}
-		if (this.getDisplayItem() != null) {
-			if (!trans) { // We have a display item in a block... delete it
-				this.getDisplayItem().remove();
-				this.displayItem = null;
-				return;
-			}
-			DisplayItem disItem = this.getDisplayItem();
-			Location dispLoc = disItem.getDisplayLocation();
-			if (dispLoc.getBlock() != null && dispLoc.getBlock().getType() == Material.WATER) {
-				disItem.remove();
-				return;
-			}
-			if (disItem.getItem() == null) {
-				disItem.removeDupe();
-				disItem.spawn();
-				return;
-			}
-			Item item = disItem.getItem();
-			if (item.getTicksLived() > 5000 || !item.isValid() || item.isDead()) {
-				disItem.respawn();
-				disItem.removeDupe();
-			} else if (item.getLocation().distanceSquared(dispLoc) > 1) {
-				item.teleport(dispLoc, TeleportCause.PLUGIN);
-			}
-		}
-	}
+
 	
 	public boolean checkDisplayMoved() {
 		// don't check if the plugin doesn't know about the object
@@ -660,22 +610,10 @@ public class ContainerShop implements Shop {
 	}
 
 	public void onLoad() {
-		checkDisplay();
-		
+
 		// update sign
 		this.setSignText();
-		
-		// check price restriction
-		Entry<Double,Double> priceRestriction = Util.getPriceRestriction(this.getMaterial());
-		if (priceRestriction!=null) {
-			if (price<priceRestriction.getKey()) {
-				price=priceRestriction.getKey();
-				this.update();
-			} else if (price>priceRestriction.getValue()) {
-				price=priceRestriction.getValue();
-				this.update();
-			}
-		}
+
 	}
 
 	public void onClick() {

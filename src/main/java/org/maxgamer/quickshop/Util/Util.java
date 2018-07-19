@@ -35,196 +35,24 @@ import org.maxgamer.quickshop.Shop.Shop;
 
 @SuppressWarnings("deprecation")
 public class Util {
-	private static HashSet<Material> tools = new HashSet<Material>();
 	private static HashSet<Material> blacklist = new HashSet<Material>();
-	private static HashSet<Material> shoppables = new HashSet<Material>();
-	private static HashSet<Material> transparent = new HashSet<Material>();
-	private static Map<Material, Entry<Double,Double>> restrictedPrices = new HashMap<Material, Entry<Double,Double>>();
+
 	private static QuickShop plugin;
 	private static Method storageContents;
 
 	public static void initialize() {
-		tools.clear();
 		blacklist.clear();
-		shoppables.clear();
-		transparent.clear();
-		restrictedPrices.clear();
 
 		plugin = QuickShop.instance;
-		for (String s : plugin.getConfig().getStringList("shop-blocks")) {
-			Material mat = Material.getMaterial(s.toUpperCase());
-			if (mat == null) {
-				try {
-					mat = Material.getMaterial(Integer.parseInt(s));
-				} catch (NumberFormatException e) {
-				}
-			}
-			if (mat == null) {
-				plugin.getLogger().info("Invalid shop-block: " + s);
-			} else {
-				shoppables.add(mat);
-			}
-		}
-		tools.add(Material.BOW);
-		tools.add(Material.SHEARS);
-		tools.add(Material.FISHING_ROD);
-		tools.add(Material.FLINT_AND_STEEL);
-		tools.add(Material.CHAINMAIL_BOOTS);
-		tools.add(Material.CHAINMAIL_CHESTPLATE);
-		tools.add(Material.CHAINMAIL_HELMET);
-		tools.add(Material.CHAINMAIL_LEGGINGS);
-		tools.add(Material.WOOD_AXE);
-		tools.add(Material.WOOD_HOE);
-		tools.add(Material.WOOD_PICKAXE);
-		tools.add(Material.WOOD_SPADE);
-		tools.add(Material.WOOD_SWORD);
-		tools.add(Material.LEATHER_BOOTS);
-		tools.add(Material.LEATHER_CHESTPLATE);
-		tools.add(Material.LEATHER_HELMET);
-		tools.add(Material.LEATHER_LEGGINGS);
-		tools.add(Material.DIAMOND_AXE);
-		tools.add(Material.DIAMOND_HOE);
-		tools.add(Material.DIAMOND_PICKAXE);
-		tools.add(Material.DIAMOND_SPADE);
-		tools.add(Material.DIAMOND_SWORD);
-		tools.add(Material.DIAMOND_BOOTS);
-		tools.add(Material.DIAMOND_CHESTPLATE);
-		tools.add(Material.DIAMOND_HELMET);
-		tools.add(Material.DIAMOND_LEGGINGS);
-		tools.add(Material.STONE_AXE);
-		tools.add(Material.STONE_HOE);
-		tools.add(Material.STONE_PICKAXE);
-		tools.add(Material.STONE_SPADE);
-		tools.add(Material.STONE_SWORD);
-		tools.add(Material.GOLD_AXE);
-		tools.add(Material.GOLD_HOE);
-		tools.add(Material.GOLD_PICKAXE);
-		tools.add(Material.GOLD_SPADE);
-		tools.add(Material.GOLD_SWORD);
-		tools.add(Material.GOLD_BOOTS);
-		tools.add(Material.GOLD_CHESTPLATE);
-		tools.add(Material.GOLD_HELMET);
-		tools.add(Material.GOLD_LEGGINGS);
-		tools.add(Material.IRON_AXE);
-		tools.add(Material.IRON_HOE);
-		tools.add(Material.IRON_PICKAXE);
-		tools.add(Material.IRON_SPADE);
-		tools.add(Material.IRON_SWORD);
-		tools.add(Material.IRON_BOOTS);
-		tools.add(Material.IRON_CHESTPLATE);
-		tools.add(Material.IRON_HELMET);
-		tools.add(Material.IRON_LEGGINGS);
+
 		List<String> configBlacklist = plugin.getConfig().getStringList("blacklist");
 		for (String s : configBlacklist) {
 			Material mat = Material.getMaterial(s.toUpperCase());
-			if (mat == null) {
-				mat = Material.getMaterial(Integer.parseInt(s));
-				if (mat == null) {
-					plugin.getLogger().info(s + " is not a valid material.  Check your spelling or ID");
-					continue;
-				}
-			}
+
 			blacklist.add(mat);
 		}
 
-		// ToDo: add extras to config file
-		addTransparentBlock(Material.AIR);
-		/* Misc */
-		addTransparentBlock(Material.CAKE_BLOCK);
-		/* Redstone Material */
-		addTransparentBlock(Material.REDSTONE_WIRE);
-		/* Redstone Torches */
-		addTransparentBlock(Material.REDSTONE_TORCH_OFF);
-		addTransparentBlock(Material.REDSTONE_TORCH_ON);
-		/* Diodes (Repeaters) */
-		addTransparentBlock(Material.DIODE_BLOCK_OFF);
-		addTransparentBlock(Material.DIODE_BLOCK_ON);
-		/* Power Sources */
-		addTransparentBlock(Material.DETECTOR_RAIL);
-		addTransparentBlock(Material.LEVER);
-		addTransparentBlock(Material.STONE_BUTTON);
-		addTransparentBlock(Material.WOOD_BUTTON);
-		addTransparentBlock(Material.STONE_PLATE);
-		addTransparentBlock(Material.WOOD_PLATE);
-		/* Nature Material */
-		addTransparentBlock(Material.RED_MUSHROOM);
-		addTransparentBlock(Material.BROWN_MUSHROOM);
-		addTransparentBlock(Material.RED_ROSE);
-		addTransparentBlock(Material.YELLOW_FLOWER);
-		addTransparentBlock(Material.FLOWER_POT);
-		/* Greens */
-		addTransparentBlock(Material.LONG_GRASS);
-		addTransparentBlock(Material.VINE);
-		addTransparentBlock(Material.WATER_LILY);
-		/* Seedy things */
-		addTransparentBlock(Material.MELON_STEM);
-		addTransparentBlock(Material.PUMPKIN_STEM);
-		addTransparentBlock(Material.CROPS);
-		addTransparentBlock(Material.NETHER_WARTS);
-		/* Semi-nature */
-		addTransparentBlock(Material.SNOW);
-		addTransparentBlock(Material.FIRE);
-		addTransparentBlock(Material.WEB);
-		addTransparentBlock(Material.TRIPWIRE);
-		addTransparentBlock(Material.TRIPWIRE_HOOK);
-		/* Stairs */
-		addTransparentBlock(Material.COBBLESTONE_STAIRS);
-		addTransparentBlock(Material.BRICK_STAIRS);
-		addTransparentBlock(Material.SANDSTONE_STAIRS);
-		addTransparentBlock(Material.NETHER_BRICK_STAIRS);
-		addTransparentBlock(Material.SMOOTH_STAIRS);
-		/* Wood Stairs */
-		addTransparentBlock(Material.BIRCH_WOOD_STAIRS);
-		addTransparentBlock(Material.WOOD_STAIRS);
-		addTransparentBlock(Material.JUNGLE_WOOD_STAIRS);
-		addTransparentBlock(Material.SPRUCE_WOOD_STAIRS);
-		/* Lava & Water */
-		addTransparentBlock(Material.LAVA);
-		addTransparentBlock(Material.STATIONARY_LAVA);
-		addTransparentBlock(Material.WATER);
-		addTransparentBlock(Material.STATIONARY_WATER);
-		/* Saplings and bushes */
-		addTransparentBlock(Material.SAPLING);
-		addTransparentBlock(Material.DEAD_BUSH);
-		/* Construction Material */
-		/* Fences */
-		addTransparentBlock(Material.FENCE);
-		addTransparentBlock(Material.FENCE_GATE);
-		addTransparentBlock(Material.IRON_FENCE);
-		addTransparentBlock(Material.NETHER_FENCE);
-		/* Ladders, Signs */
-		addTransparentBlock(Material.LADDER);
-		addTransparentBlock(Material.SIGN_POST);
-		addTransparentBlock(Material.WALL_SIGN);
-		/* Bed */
-		addTransparentBlock(Material.BED_BLOCK);
-		/* Pistons */
-		addTransparentBlock(Material.PISTON_EXTENSION);
-		addTransparentBlock(Material.PISTON_MOVING_PIECE);
-		addTransparentBlock(Material.RAILS);
-		/* Torch & Trapdoor */
-		addTransparentBlock(Material.TORCH);
-		addTransparentBlock(Material.TRAP_DOOR);
-		/* New */
-		addTransparentBlock(Material.BREWING_STAND);
-		addTransparentBlock(Material.WOODEN_DOOR);
-		addTransparentBlock(Material.WOOD_STEP);
 
-		for (String s : plugin.getConfig().getStringList("price-restriction")) {
-			String[] sp = s.split(";");
-			if (sp.length==3) {
-				try {
-					Material mat = Material.matchMaterial(sp[0]);
-					if (mat == null) {
-						throw new Exception();
-					}
-
-					restrictedPrices.put(mat, new SimpleEntry<Double,Double>(Double.valueOf(sp[1]), Double.valueOf(sp[2])));
-				} catch (Exception e) {
-					plugin.getLogger().info("Invalid price restricted material: " + s);
-				}
-			}
-		}
 		
 		try {
 			storageContents = Inventory.class.getMethod("getStorageContents");
@@ -238,22 +66,6 @@ public class Util {
 	}
 
 	/** Return an entry with min and max prices, but null if there isn't a price restriction */
-	public static Entry<Double,Double> getPriceRestriction(Material material) {
-		return restrictedPrices.get(material);
-	}
-
-	public static boolean isTransparent(Material m) {
-		boolean trans = transparent.contains(m);
-		return trans;
-	}
-
-	public static void addTransparentBlock(Material m) {
-		if (transparent.add(m) == false) {
-			System.out.println("Already added as transparent: " + m.toString());
-		}
-		if (!m.isBlock())
-			System.out.println(m + " is not a block!");
-	}
 
 	public static void parseColours(YamlConfiguration config) {
 		Set<String> keys = config.getKeys(true);
@@ -275,10 +87,7 @@ public class Util {
 	 * @return True if it can be made into a shop, otherwise false.
 	 */
 	public static boolean canBeShop(Block b) {
-		BlockState bs = b.getState();
-		if (bs instanceof InventoryHolder == false)
-			return false;
-		return shoppables.contains(bs.getType());
+		return b.getType()==Material.CHEST;
 	}
 
 	/**
@@ -354,11 +163,12 @@ public class Util {
 	/**
 	 * Converts a string into an item from the database.
 	 * 
-	 * @param itemString
+	 *   itemString
 	 *            The database string. Is the result of makeString(ItemStack
 	 *            item).
 	 * @return A new itemstack, with the properties given in the string
 	 */
+	/*
 	public static ItemStack makeItem(String itemString) {
 		String[] itemInfo = itemString.split(":");
 		ItemStack item = new ItemStack(Material.getMaterial(itemInfo[0]));
@@ -380,7 +190,7 @@ public class Util {
 		}
 		return item;
 	}
-
+*/
 	public static String serialize(ItemStack iStack) {
 		YamlConfiguration cfg = new YamlConfiguration();
 		cfg.set("item", iStack);
@@ -403,17 +213,7 @@ public class Util {
 	 * @return The human readable item name.
 	 */
 	public static String getName(ItemStack itemStack) {
-		if (NMS.isPotion(itemStack.getType())) {
-			return CustomPotionsName.getFullName(itemStack);
-		}
-		
-		CustomItemName customItemName = QuickShop.instance.getCustomItemNames(itemStack);
-		if (customItemName!=null) {
-			return customItemName.getFullName();
-		}
-		
-		String vanillaName = getDataName(itemStack.getType(), itemStack.getDurability());
-		return prettifyText(vanillaName);
+		return itemStack.getType().name();
 	}
 
 	/**
@@ -451,7 +251,7 @@ public class Util {
 			return customItemName.getSignName();
 		}
 		
-		String name = getDataName(itemStack.getType(), itemStack.getDurability());
+		String name = itemStack.getType().name();
 
 		String[] nameParts = name.split("_");
 		if (nameParts.length==1) {
@@ -510,366 +310,6 @@ public class Util {
 		return roman;
 	}
 
-	/**
-	 * Converts a given material and data value into a format similar to
-	 * Material.<?>.toString(). Upper case, with underscores. Includes material
-	 * name in result.
-	 * 
-	 * @param mat
-	 *            The base material.
-	 * @param damage
-	 *            The durability/damage of the item.
-	 * @return A string with the name of the item.
-	 */
-	private static String getDataName(Material mat, short damage) {
-		int id = mat.getId();
-		switch (id) {
-		case 35:
-			switch ((int) damage) {
-			case 0:
-				return "WHITE_WOOL";
-			case 1:
-				return "ORANGE_WOOL";
-			case 2:
-				return "MAGENTA_WOOL";
-			case 3:
-				return "LIGHT_BLUE_WOOL";
-			case 4:
-				return "YELLOW_WOOL";
-			case 5:
-				return "LIME_WOOL";
-			case 6:
-				return "PINK_WOOL";
-			case 7:
-				return "GRAY_WOOL";
-			case 8:
-				return "LIGHT_GRAY_WOOL";
-			case 9:
-				return "CYAN_WOOL";
-			case 10:
-				return "PURPLE_WOOL";
-			case 11:
-				return "BLUE_WOOL";
-			case 12:
-				return "BROWN_WOOL";
-			case 13:
-				return "GREEN_WOOL";
-			case 14:
-				return "RED_WOOL";
-			case 15:
-				return "BLACK_WOOL";
-			}
-			return mat.toString();
-		case 351:
-			switch ((int) damage) {
-			case 0:
-				return "INK_SAC";
-			case 1:
-				return "ROSE_RED";
-			case 2:
-				return "CACTUS_GREEN";
-			case 3:
-				return "COCOA_BEANS";
-			case 4:
-				return "LAPIS_LAZULI";
-			case 5:
-				return "PURPLE_DYE";
-			case 6:
-				return "CYAN_DYE";
-			case 7:
-				return "LIGHT_GRAY_DYE";
-			case 8:
-				return "GRAY_DYE";
-			case 9:
-				return "PINK_DYE";
-			case 10:
-				return "LIME_DYE";
-			case 11:
-				return "DANDELION_YELLOW";
-			case 12:
-				return "LIGHT_BLUE_DYE";
-			case 13:
-				return "MAGENTA_DYE";
-			case 14:
-				return "ORANGE_DYE";
-			case 15:
-				return "BONE_MEAL";
-			}
-			return mat.toString();
-		case 98:
-			switch ((int) damage) {
-			case 0:
-				return "STONE_BRICKS";
-			case 1:
-				return "MOSSY_STONE_BRICKS";
-			case 2:
-				return "CRACKED_STONE_BRICKS";
-			case 3:
-				return "CHISELED_STONE_BRICKS";
-			}
-			return mat.toString();
-		case 373:
-			// Special case,.. Why?
-			if (damage == 0)
-				return "WATER_BOTTLE";
-			Potion pot;
-			try {
-				pot = Potion.fromDamage(damage);
-			} catch (Exception e) {
-				return "CUSTOM_POTION";
-			}
-			String prefix = "";
-			String suffix = "";
-			if (pot.getLevel() > 0)
-				suffix += "_" + pot.getLevel();
-			if (pot.hasExtendedDuration())
-				prefix += "EXTENDED_";
-			if (pot.isSplash())
-				prefix += "SPLASH_";
-			if (pot.getEffects().isEmpty()) {
-				switch ((int) pot.getNameId()) {
-				case 0:
-					return prefix + "MUNDANE_POTION" + suffix;
-				case 7:
-					return prefix + "CLEAR_POTION" + suffix;
-				case 11:
-					return prefix + "DIFFUSE_POTION" + suffix;
-				case 13:
-					return prefix + "ARTLESS_POTION" + suffix;
-				case 15:
-					return prefix + "THIN_POTION" + suffix;
-				case 16:
-					return prefix + "AWKWARD_POTION" + suffix;
-				case 32:
-					return prefix + "THICK_POTION" + suffix;
-				}
-			} else {
-				String effects = "";
-				for (PotionEffect effect : pot.getEffects()) {
-					effects += effect.toString().split(":")[0];
-				}
-				return prefix + effects + suffix;
-			}
-			return mat.toString();
-		case 6:
-			switch ((int) damage) {
-			case 0:
-				return "OAK_SAPLING";
-			case 1:
-				return "PINE_SAPLING";
-			case 2:
-				return "BIRCH_SAPLING";
-			case 3:
-				return "JUNGLE_TREE_SAPLING";
-			}
-			return mat.toString();
-		case 5:
-			switch ((int) damage) {
-			case 0:
-				return "OAK_PLANKS";
-			case 1:
-				return "PINE_PLANKS";
-			case 2:
-				return "BIRCH_PLANKS";
-			case 3:
-				return "JUNGLE_PLANKS";
-			}
-			return mat.toString();
-		case 17:
-			switch (damage) {
-			case 0:
-				return "OAK_LOG";
-			case 1:
-				return "PINE_LOG";
-			case 2:
-				return "BIRCH_LOG";
-			case 3:
-				return "JUNGLE_LOG";
-			}
-			return mat.toString();
-		case 18:
-			damage = (short) (damage % 4);
-			switch (damage) {
-			case 0:
-				return "OAK_LEAVES";
-			case 1:
-				return "PINE_LEAVES";
-			case 2:
-				return "BIRCH_LEAVES";
-			case 3:
-				return "JUNGLE_LEAVES";
-			}
-		case 263:
-			switch (damage) {
-			case 0:
-				return "COAL";
-			case 1:
-				return "CHARCOAL";
-			}
-			return mat.toString();
-		case 24:
-			switch ((int) damage) {
-			case 0:
-				return "SANDSTONE";
-			case 1:
-				return "CHISELED_SANDSTONE";
-			case 2:
-				return "SMOOTH_SANDSTONE";
-			}
-			return mat.toString();
-		case 31:
-			switch ((int) damage) {
-			case 0:
-				return "DEAD_SHRUB";
-			case 1:
-				return "TALL_GRASS";
-			case 2:
-				return "FERN";
-			}
-			return mat.toString();
-		case 44:
-			switch ((int) damage) {
-			case 0:
-				return "STONE_SLAB";
-			case 1:
-				return "SANDSTONE_SLAB";
-			case 2:
-				return "WOODEN_SLAB";
-			case 3:
-				return "COBBLESTONE_SLAB";
-			case 4:
-				return "BRICK_SLAB";
-			case 5:
-				return "STONE_BRICK_SLAB";
-			}
-			return mat.toString();
-		case 383:
-			switch ((int) damage) {
-			case 50:
-				return "CREEPER_EGG";
-			case 51:
-				return "SKELETON_EGG";
-			case 52:
-				return "SPIDER_EGG";
-			case 53:
-				return "GIANT_EGG";
-			case 54:
-				return "ZOMBIE_EGG";
-			case 55:
-				return "SLIME_EGG";
-			case 56:
-				return "GHAST_EGG";
-			case 57:
-				return "ZOMBIE_PIGMAN_EGG";
-			case 58:
-				return "ENDERMAN_EGG";
-			case 59:
-				return "CAVE_SPIDER_EGG";
-			case 60:
-				return "SILVERFISH_EGG";
-			case 61:
-				return "BLAZE_EGG";
-			case 62:
-				return "MAGMA_CUBE_EGG";
-			case 63:
-				return "ENDER_DRAGON_EGG";
-			case 90:
-				return "PIG_EGG";
-			case 91:
-				return "SHEEP_EGG";
-			case 92:
-				return "COW_EGG";
-			case 93:
-				return "CHICKEN_EGG";
-			case 94:
-				return "SQUID_EGG";
-			case 95:
-				return "WOLF_EGG";
-			case 96:
-				return "MOOSHROOM_EGG";
-			case 97:
-				return "SNOW_GOLEM_EGG";
-			case 98:
-				return "OCELOT_EGG";
-			case 99:
-				return "IRON_GOLEM_EGG";
-			case 120:
-				return "VILLAGER_EGG";
-			case 200:
-				return "ENDER_CRYSTAL_EGG";
-			case 14:
-				return "PRIMED_TNT_EGG";
-			case 66:
-				return "WITCH_EGG";
-			case 65:
-				return "BAT_EGG";
-			}
-			return mat.toString();
-		case 397:
-			switch ((int) damage) {
-			case 0:
-				return "SKELETON_SKULL";
-			case 1:
-				return "WITHER_SKULL";
-			case 2:
-				return "ZOMBIE_HEAD";
-			case 3:
-				return "PLAYER_HEAD";
-			case 4:
-				return "CREEPER_HEAD";
-			}
-			break;
-		case 76:
-			return "REDSTONE_TORCH";
-		case 115:
-			return "NETHER_WART";
-		case 30:
-			return "COBWEB";
-		case 102:
-			return "GLASS_PANE";
-		case 101:
-			return "IRON_BARS";
-		case 58:
-			return "CRAFTING_TABLE";
-		case 123:
-			return "REDSTONE_LAMP";
-		case 392:
-			return "POTATO";
-		case 289:
-			return "GUNPOWDER";
-		case 391:
-			return "CARROT";
-		case 322:
-			switch ((int) damage) {
-			case 0:
-				return "GOLDEN_APPLE";
-			case 1:
-				return "ENCHANTED_GOLDEN_APPLE";
-			}
-			break;
-		case 390:
-			return "FLOWER_POT";
-		case 145:
-			switch ((int) damage) {
-			case 0:
-				return "ANVIL";
-			case 1:
-				return "SLIGHTLY_DAMAGED_ANVIL";
-			case 2:
-				return "VERY_DAMAGED:ANVIL";
-			}
-			break;
-		case 384:
-			return "BOTTLE_O'_ENCHANTING";
-		case 402:
-			return "FIREWORK_STAR";
-		case 385:
-			return "FIREWORK_CHARGE";
-		}
-		if (damage == 0 || isTool(mat))
-			return mat.toString();
-		return mat.toString() + ":" + damage;
-	}
 
 	/**
 	 * @param mat
@@ -877,9 +317,6 @@ public class Util {
 	 * @return Returns true if the item is a tool (Has durability) or false if
 	 *         it doesn't.
 	 */
-	public static boolean isTool(Material mat) {
-		return tools.contains(mat);
-	}
 
 	/**
 	 * Compares two items to each other. Returns true if they match.
@@ -953,13 +390,7 @@ public class Util {
 		return blacklist.contains(m);
 	}
 
-	/**
-	 * Fetches the block which the given sign is attached to
-	 * 
-	 * @param sign
-	 *            The sign which is attached
-	 * @return The block the sign is attached to
-	 */
+
 	public static Block getAttached(Block b) {
 		try {
 			Sign sign = (Sign) b.getState().getData(); // Throws a NPE

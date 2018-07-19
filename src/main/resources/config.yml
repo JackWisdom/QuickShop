@@ -1,22 +1,18 @@
 #Default config: https://github.com/KaiKikuchi/QuickShop/blob/master/src/main/resources/config.yml
 
 #Tax amount (decimal) - Eg, P1 buys $50 worth of stuff from P2.  Therefore, P1 loses $50, P2 gains $(1-0.05)*50, and tax-account gains $(0.05)*50.
-tax: 0.05
+tax: 0
 
 #The fake player who money from taxing people goes to
-tax-account: tax
+tax-account: qwq
 
 #Whether or not to show taxes paid when selling to a shop
 show-tax: false
 
-#Should we log transactions/creations to Bukkit\Plugins\QuickShop\qs.log?
-log-actions: true
 
 #For item-item based economies that don't use virtual coins.
 whole-number-prices-only: false
 
-#Force bukkit chat handler (https://github.com/KaiKikuchi/QuickShop/issues/10)
-force-bukkit-chat-handler: false
 
 database:
     mysql: false
@@ -47,13 +43,11 @@ limits:
 #shop on a hopper (It sucks the display item in) and furnace shops
 #allow players to put whatever item they want in all 3 slots and
 #dispenser shops aren't protected from redstone... Etc.
-shop-blocks:
-    - CHEST
-    - TRAPPED_CHEST
+
 
 shop:
     #Cost to make a stall
-    cost: 10
+    cost: 1000
     #Should we refund when their shops are deleted/removed/broken?
     refund: false
 
@@ -89,12 +83,10 @@ shop:
 
 #List of items to disallow selling of.  Anyone with quickshop.bypass.<itemID> can bypass it    
 blacklist:
-- 7 #Bedrock
+- Bedrock
     
     
 #List of items with restricted prices. Format: <ItemID>;<MinPrice>;<MaxPrice>
-price-restriction:
-- Bedrock;100;200
 
 #Custom name for items. Format: <ItemID[*DataValue]>;<CustomSignName>;<CustomFullName>
 # Vanilla Material list (ItemIDs): https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html

@@ -319,12 +319,7 @@ public class ShopManager {
 							return;
 						}
 						// Check price restriction
-						Entry<Double,Double> priceRestriction = Util.getPriceRestriction(info.getItem().getType());
-						if (priceRestriction!=null) {
-							if (price<priceRestriction.getKey() || price>priceRestriction.getValue()) {
-								p.sendMessage(ChatColor.RED+"Restricted prices for "+info.getItem().getType()+": min "+priceRestriction.getKey()+", max "+priceRestriction.getValue());
-							}
-						}
+
 
 						double tax = plugin.getConfig().getDouble("shop.cost");
 						// Tax refers to the cost to create a shop. Not actual
@@ -336,6 +331,9 @@ public class ShopManager {
 						// Create the sample shop.
 						Shop shop = new ContainerShop(info.getLocation(), price, info.getItem(), p.getUniqueId());
 						shop.onLoad();
+						if(p.isOp()){
+							shop.setUnlimited(true);
+						}
 						ShopCreateEvent e = new ShopCreateEvent(shop, p);
 						Bukkit.getPluginManager().callEvent(e);
 						if (e.isCancelled()) {
